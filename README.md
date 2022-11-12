@@ -2,9 +2,9 @@
 Like Twint, but zero fat.
 
 # Installation
-1) `git clone https://github.com/twintproject/twint-zero``
-2) ´cd twint-zero``
-3) `git mod init twint-zero``
+1) `git clone https://github.com/twintproject/twint-zero`
+2) `cd twint-zero`
+3) `git mod init twint-zero`
 4) `git mod tidy`
 
 # Usage
