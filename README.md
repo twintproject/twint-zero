@@ -4,8 +4,8 @@ Like Twint, but zero fat.
 # Installation
 1) `git clone https://github.com/twintproject/twint-zero`
 2) `cd twint-zero`
-3) `git mod init twint-zero`
-4) `git mod tidy`
+3) `go mod init twint-zero`
+4) `go mod tidy`
 
 # Usage
 - Without compiling: `go run main.go -Query $QUERY -Instance $INSTANCE`
