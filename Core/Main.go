@@ -1,6 +1,7 @@
 package Core
 
 import (
+	"net/url"
 )
 
 var(
@@ -8,8 +9,9 @@ var(
 	cursor    string = ""
 )
 
-func Main(Username *string, Instance *string) () {
+func Main(Query *string, Instance *string) () {
+	(*Query) = url.QueryEscape(*Query)
 	for condition {
-		condition = Scrape(Request(Username, Instance, &cursor), &cursor)
+		condition = Scrape(Request(Query, Instance, &cursor), &cursor)
 	}
 }

@@ -12,8 +12,8 @@ var (
 	Client *http.Client = new(http.Client);
 )
 
-func Request(Username *string, Instance *string, cursor *string) (io.ReadCloser) {
-	var url string = fmt.Sprintf("https://%s/search?f=tweet&q=%s", *Instance, *Username)
+func Request(Query *string, Instance *string, cursor *string) (io.ReadCloser) {
+	var url string = fmt.Sprintf("https://%s/search?f=tweet&q=%s", *Instance, *Query)
 	if *cursor != "" {
 		url = fmt.Sprintf("https://%s/search%s", *Instance, *cursor)
 	}
@@ -31,7 +31,7 @@ func Request(Username *string, Instance *string, cursor *string) (io.ReadCloser)
 	if res.StatusCode != 200 {
 		if 500 <= res.StatusCode && res.StatusCode <= 599 {
 			time.Sleep(10 * time.Second)
-			return Request(Username, Instance, cursor)
+			return Request(Query, Instance, cursor)
 		} else {
 			log.Fatalf("status code error: %d %s \n %s", res.StatusCode, res.Status, url)
 		}

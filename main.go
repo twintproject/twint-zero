@@ -1,8 +1,8 @@
 package main
 
 import (
-	"twint-zero/InputParser"
-	"twint-zero/Core"
+	"twint-lite/InputParser"
+	"twint-lite/Core"
 )
 
 func main() {
