@@ -39,7 +39,7 @@ func FormatTweetsCSV(tweets []Tweet) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(string(buf.Bytes()))
+	fmt.Print(string(buf.Bytes()))
 }
 
 func FormatTweetsJSON(tweets []Tweet) {
