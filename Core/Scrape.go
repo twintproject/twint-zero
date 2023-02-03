@@ -48,6 +48,7 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 		return false
 	}
 
+	var tweets []Tweet
 	parsedWebpage.Find("div.timeline-item").Each(func(i int, t *goquery.Selection) {
 		tweet_ID_h, _ := t.Find("a").Attr("href")
 		tweet_ID_s := strings.Split(tweet_ID_h, "/")
@@ -70,13 +71,11 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 			Fullname:  tweet_fname,
 			Timestamp: tweet_TS,
 		}
-
-		if *Format == "json" {
-			FormatJSON(tweet)
-		} else {
-			FormatDefault(tweet)
-		}
+		tweets = append(tweets, tweet)
 	})
+
+	FormatTweets(*Format, tweets)
+
 	*cursor, _ = parsedWebpage.Find("div.show-more").Last().Find("a").Attr("href")
 	return true
 }
