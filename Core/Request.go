@@ -1,18 +1,18 @@
 package Core
 
 import (
-	"io"
 	"fmt"
+	"io"
 	"log"
-	"time"
 	"net/http"
+	"time"
 )
 
 var (
-	Client *http.Client = new(http.Client);
+	Client *http.Client = new(http.Client)
 )
 
-func Request(Query *string, Instance *string, cursor *string) (io.ReadCloser) {
+func Request(Query *string, Instance *string, cursor *string) io.ReadCloser {
 	var url string = fmt.Sprintf("https://%s/search?f=tweet&q=%s", *Instance, *Query)
 	if *cursor != "" {
 		url = fmt.Sprintf("https://%s/search%s", *Instance, *cursor)
