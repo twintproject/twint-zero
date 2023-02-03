@@ -63,15 +63,17 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 		tweet_handle := t.Find("a.username").First().Text()
 		tweet_fname := t.Find("a.fullname").First().Text()
 
-		tweet := Tweet{
-			ID:        tweet_ID,
-			URL:       tweet_URL,
-			Text:      tweet_text,
-			Username:  tweet_handle,
-			Fullname:  tweet_fname,
-			Timestamp: tweet_TS,
+		if tweet_ID != 0 {
+			tweet := Tweet{
+				ID:        tweet_ID,
+				URL:       tweet_URL,
+				Text:      tweet_text,
+				Username:  tweet_handle,
+				Fullname:  tweet_fname,
+				Timestamp: tweet_TS,
+			}
+			tweets = append(tweets, tweet)
 		}
-		tweets = append(tweets, tweet)
 	})
 
 	FormatTweets(*Format, tweets)
