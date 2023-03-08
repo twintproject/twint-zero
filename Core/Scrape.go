@@ -11,17 +11,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-var (
-	escapeChars *strings.Replacer = strings.NewReplacer(
-		"\n", " ",
-		"\t", " ",
-		"\r", " ",
-		";", " ",
-		",", " ",
-	)
-	Webpage *goquery.Document = new(goquery.Document)
-)
-
 type Tweet struct {
 	ID        int    `json:"id"`
 	URL       string `json:"url"`
@@ -58,7 +47,7 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 
 		tweet_TS, _ := t.Find("span.tweet-date").Find("a").Attr("title")
 
-		tweet_text := escapeChars.Replace(t.Find("div.tweet-content.media-body").Text())
+		tweet_text := t.Find("div.tweet-content.media-body").Text()
 
 		tweet_handle := t.Find("a.username").First().Text()
 		tweet_fname := t.Find("a.fullname").First().Text()
