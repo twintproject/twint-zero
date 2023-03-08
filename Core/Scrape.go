@@ -5,14 +5,13 @@ import (
 	"io"
 	"log"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 type Tweet struct {
-	ID        int    `json:"id"`
+	ID        string `json:"id"`
 	URL       string `json:"url"`
 	Text      string `json:"text"`
 	Username  string `json:"username"`
@@ -41,7 +40,7 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 	parsedWebpage.Find("div.timeline-item").Each(func(i int, t *goquery.Selection) {
 		tweet_ID_h, _ := t.Find("a").Attr("href")
 		tweet_ID_s := strings.Split(tweet_ID_h, "/")
-		tweet_ID, _ := strconv.Atoi(extractViaRegexp(&(tweet_ID_s[len(tweet_ID_s)-1]), `\d*`))
+		tweet_ID := extractViaRegexp(&(tweet_ID_s[len(tweet_ID_s)-1]), `\d*`)
 
 		tweet_URL := fmt.Sprintf("https://twitter.com%s", strings.Split(tweet_ID_h, "#")[0])
 
@@ -52,7 +51,7 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 		tweet_handle := t.Find("a.username").First().Text()
 		tweet_fname := t.Find("a.fullname").First().Text()
 
-		if tweet_ID != 0 {
+		if tweet_ID != "" {
 			tweet := Tweet{
 				ID:        tweet_ID,
 				URL:       tweet_URL,

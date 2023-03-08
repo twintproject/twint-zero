@@ -23,7 +23,7 @@ func FormatTweetsCSV(tweets []Tweet) {
 
 	for _, tweet := range tweets {
 		row := []string{
-			fmt.Sprintf("%d", tweet.ID),
+			tweet.ID,
 			tweet.URL,
 			tweet.Timestamp,
 			tweet.Username,
