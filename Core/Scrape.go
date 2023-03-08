@@ -64,6 +64,10 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 		}
 	})
 
+	if len(tweets) == 0 {
+		return false
+	}
+
 	FormatTweets(*Format, tweets)
 
 	*cursor, _ = parsedWebpage.Find("div.show-more").Last().Find("a").Attr("href")
