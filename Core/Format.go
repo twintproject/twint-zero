@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 )
 
 func FormatTweets(format string, tweets []Tweet) {
@@ -22,6 +23,10 @@ func FormatTweetsCSV(tweets []Tweet) {
 	w := csv.NewWriter(buf)
 
 	for _, tweet := range tweets {
+		attachments := make([]string, len(tweet.Attachments))
+		for i, att := range tweet.Attachments {
+			attachments[i] = *att.URL
+		}
 		row := []string{
 			tweet.ID,
 			tweet.URL,
@@ -29,6 +34,7 @@ func FormatTweetsCSV(tweets []Tweet) {
 			tweet.Username,
 			tweet.Fullname,
 			tweet.Text,
+			strings.Join(attachments, ","),
 		}
 		if err := w.Write(row); err != nil {
 			log.Fatalln("error writing row to csv:", err)
