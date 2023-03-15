@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/url"
 	"regexp"
 	"strings"
 
@@ -11,18 +12,49 @@ import (
 )
 
 type Tweet struct {
-	ID        string `json:"id"`
-	URL       string `json:"url"`
-	Text      string `json:"text"`
-	Username  string `json:"username"`
-	Fullname  string `json:"fullname"`
-	Timestamp string `json:"timestamp"`
+	ID          string       `json:"id"`
+	URL         string       `json:"url"`
+	Text        string       `json:"text"`
+	Username    string       `json:"username"`
+	Fullname    string       `json:"fullname"`
+	Timestamp   string       `json:"timestamp"`
+	Attachments []Attachment `json:"attachments"`
+}
+
+type Attachment struct {
+	Type            string  `json:"type"`
+	URL             *string `json:"url"`
+	PreviewImageURL *string `json:"preview_image_url"`
+	AltText         *string `json:"alt_text"`
 }
 
 func extractViaRegexp(text *string, re string) string {
 	theRegex := regexp.MustCompile(re)
 	match := theRegex.Find([]byte(*text))
 	return string(match[:])
+}
+
+func imageURLToTwimg(ur string) (ret *string) {
+	ur, _ = url.QueryUnescape(ur)
+	ur = strings.Replace(ur, "/pic/", "https://pbs.twimg.com/", 1)
+	ur = strings.Replace(ur, "&name=small", "", 1)
+	ur = strings.Replace(ur, "name=small", "", 1)
+	ur = strings.TrimRight(ur, "?")
+	ret = &ur
+	return
+}
+
+func videoURLToTwimg(ur string) (ret *string) {
+	ur, _ = url.QueryUnescape(ur)
+	idx := strings.Index(ur, "https://video")
+	if idx > -1 {
+		ur = ur[idx:]
+	} else {
+		idx = strings.Index(ur, "video.tw")
+		ur = "https://" + ur[idx:]
+	}
+	ret = &ur
+	return
 }
 
 func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
@@ -51,14 +83,54 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 		tweet_handle := t.Find("a.username").First().Text()
 		tweet_fname := t.Find("a.fullname").First().Text()
 
+		tweet_attachments := make([]Attachment, 0)
+		t.Find("div.attachments").Find("div.attachment.image").Find("img").Each(func(i int, s *goquery.Selection) {
+			src, exists := s.Attr("src")
+			alt, _ := s.Attr("alt")
+			if exists {
+				tweet_attachments = append(tweet_attachments, Attachment{
+					Type:    "photo",
+					URL:     imageURLToTwimg(src),
+					AltText: &alt,
+				})
+			}
+		})
+		t.Find("div.attachments").Find("video.gif").Each(func(i int, s *goquery.Selection) {
+			preview, exists := s.Attr("poster")
+			if exists {
+				src, _ := s.Find("source").Attr("src")
+				tweet_attachments = append(tweet_attachments, Attachment{
+					Type:            "animated_gif",
+					URL:             videoURLToTwimg(src),
+					PreviewImageURL: imageURLToTwimg(preview),
+				})
+			}
+		})
+		t.Find("div.attachments").Find("div.gallery-video").Find("video").Each(func(i int, s *goquery.Selection) {
+			preview, exists := s.Attr("poster")
+			if exists {
+				var ur *string
+				src, exists := s.Attr("data-url")
+				if exists {
+					ur = videoURLToTwimg(src)
+				}
+				tweet_attachments = append(tweet_attachments, Attachment{
+					Type:            "video",
+					URL:             ur,
+					PreviewImageURL: imageURLToTwimg(preview),
+				})
+			}
+		})
+
 		if tweet_ID != "" {
 			tweet := Tweet{
-				ID:        tweet_ID,
-				URL:       tweet_URL,
-				Text:      tweet_text,
-				Username:  tweet_handle,
-				Fullname:  tweet_fname,
-				Timestamp: tweet_TS,
+				ID:          tweet_ID,
+				URL:         tweet_URL,
+				Text:        tweet_text,
+				Username:    tweet_handle,
+				Fullname:    tweet_fname,
+				Timestamp:   tweet_TS,
+				Attachments: tweet_attachments,
 			}
 			tweets = append(tweets, tweet)
 		}
