@@ -26,3 +26,4 @@ MIT
 
 # Credits
 [Francesco Poldi](https://twitter.com/noneprivacy)
+[Simon Archer](https://mastodon.social/@archy_bold): JSON formatting and attachments parsing
