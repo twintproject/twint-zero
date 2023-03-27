@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -19,6 +20,8 @@ type Tweet struct {
 	Fullname    string       `json:"fullname"`
 	Timestamp   string       `json:"timestamp"`
 	Attachments []Attachment `json:"attachments"`
+
+	Stats TweetStats `json:"stats"`
 }
 
 type Attachment struct {
@@ -26,6 +29,13 @@ type Attachment struct {
 	URL             *string `json:"url"`
 	PreviewImageURL *string `json:"preview_image_url"`
 	AltText         *string `json:"alt_text"`
+}
+
+type TweetStats struct {
+	Replies  int64 `json:"replies"`
+	Retweets int64 `json:"retweets"`
+	Quotes   int64 `json:"quotes"`
+	Likes    int64 `json:"likes"`
 }
 
 func extractViaRegexp(text *string, re string) string {
@@ -83,6 +93,25 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 		tweet_handle := t.Find("a.username").First().Text()
 		tweet_fname := t.Find("a.fullname").First().Text()
 
+		// tweet stats: reply, retweet, quote, like as span.tweet-stats childs of tweet_stats
+		tweet_stats := t.Find("div.tweet-stats")
+		tweet_stats_reply, _ := strconv.ParseInt(
+			strings.TrimSpace(
+				strings.ReplaceAll(
+					tweet_stats.Find("span.tweet-stat").Eq(0).Text(), ",", "",)), 10, 64)
+		tweet_stats_retweet, _ := strconv.ParseInt(
+			strings.TrimSpace(
+				strings.ReplaceAll(
+					tweet_stats.Find("span.tweet-stat").Eq(1).Text(), ",", "")), 10, 64)
+		tweet_stats_quote, _ := strconv.ParseInt(
+			strings.TrimSpace(
+				strings.ReplaceAll(
+					tweet_stats.Find("span.tweet-stat").Eq(2).Text(), ",", "")), 10, 64)
+		tweet_stats_like, _ := strconv.ParseInt(
+			strings.TrimSpace(
+				strings.ReplaceAll(
+					tweet_stats.Find("span.tweet-stat").Eq(3).Text(), ",", "")), 10, 64)
+		
 		tweet_attachments := make([]Attachment, 0)
 		t.Find("div.attachments").Find("div.attachment.image").Find("img").Each(func(i int, s *goquery.Selection) {
 			src, exists := s.Attr("src")
@@ -122,6 +151,13 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 			}
 		})
 
+		stats := TweetStats{
+			Replies:  tweet_stats_reply,
+			Retweets: tweet_stats_retweet,
+			Quotes:   tweet_stats_quote,
+			Likes:    tweet_stats_like,
+		}
+
 		if tweet_ID != "" {
 			tweet := Tweet{
 				ID:          tweet_ID,
@@ -131,6 +167,7 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 				Fullname:    tweet_fname,
 				Timestamp:   tweet_TS,
 				Attachments: tweet_attachments,
+				Stats:       stats,
 			}
 			tweets = append(tweets, tweet)
 		}
