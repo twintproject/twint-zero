@@ -1,6 +1,11 @@
 # Twint Zero
 Like Twint, but zero fat.
 
+# First things first
+
+Users are invited **to not** scrape public instances, that will cause a bad experience for some users. Instead, you are invited to setup your own custom Nitter instance.
+Thank you, and enjoy!
+
 # Installation
 1) `git clone https://github.com/twintproject/twint-zero`
 2) `cd twint-zero`
