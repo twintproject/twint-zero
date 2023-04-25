@@ -15,6 +15,7 @@ Like Twint, but zero fat.
 1) `$QUERY`: [Here](https://github.com/igorbrigadir/twitter-advanced-search) you go.
 2) `$INSTANCE`: [Here](https://github.com/zedeus/nitter/wiki/Instances) you go.
 2) `$FORMAT`: "csv" or "json".
+4) `$Archive`: csv output file name
 
 # Questions/issues
 > Sir, the bill is: five GitHub stars, two forks and one retweet.

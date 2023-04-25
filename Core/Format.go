@@ -7,22 +7,27 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"os"
+	
 )
 
-func FormatTweets(format string, tweets []Tweet) {
+func FormatTweets(format string, tweets []Tweet, file *os.File) {
 	if format == "json" {
 		FormatTweetsJSON(tweets)
 	} else {
-		FormatTweetsCSV(tweets)
+		FormatTweetsCSV(tweets, file)
 	}
 }
 
-func FormatTweetsCSV(tweets []Tweet) {
+func FormatTweetsCSV(tweets []Tweet, file *os.File) {
 	var b []byte
 	buf := bytes.NewBuffer(b)
-	w := csv.NewWriter(buf)
+	terminal := csv.NewWriter(buf)
+	w := csv.NewWriter(file)
+
 
 	for _, tweet := range tweets {
+		
 		attachments := make([]string, len(tweet.Attachments))
 		for i, att := range tweet.Attachments {
 			attachments[i] = *att.URL
@@ -43,13 +48,22 @@ func FormatTweetsCSV(tweets []Tweet) {
 		if err := w.Write(row); err != nil {
 			log.Fatalln("error writing row to csv:", err)
 		}
+
+		if err := terminal.Write(row); err != nil {
+			log.Fatalln("error writing row to csv:", err)
+		}
 	}
 	w.Flush()
 	if err := w.Error(); err != nil {
 		log.Fatal(err)
 	}
+	terminal.Flush()
+	if err := terminal.Error(); err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Print(string(buf.Bytes()))
+
 }
 
 func FormatTweetsJSON(tweets []Tweet) {

@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"os"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -67,7 +68,7 @@ func videoURLToTwimg(ur string) (ret *string) {
 	return
 }
 
-func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
+func Scrape(responseBody io.ReadCloser, Format *string, cursor *string, file *os.File) bool {
 	parsedWebpage, err := goquery.NewDocumentFromReader(responseBody)
 	if err != nil {
 		log.Fatal("[x] cannot parse webpage. Please report to admins with the query attached.")
@@ -177,7 +178,7 @@ func Scrape(responseBody io.ReadCloser, Format *string, cursor *string) bool {
 		return false
 	}
 
-	FormatTweets(*Format, tweets)
+	FormatTweets(*Format, tweets, file)
 
 	*cursor, _ = parsedWebpage.Find("div.show-more").Last().Find("a").Attr("href")
 	return true

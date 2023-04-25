@@ -7,5 +7,5 @@ import (
 
 func main() {
 	Arguments := InputParser.InputParser()
-	Core.Main(&(Arguments.Query), &(Arguments.Instance), &(Arguments.Format))
+	Core.Main(&(Arguments.Query), &(Arguments.Instance), &(Arguments.Format), &(Arguments.FileName))
 }
