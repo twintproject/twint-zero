@@ -12,6 +12,6 @@ var (
 func Main(Query *string, Instance *string, Format *string) {
 	(*Query) = url.QueryEscape(*Query)
 	for condition {
-		condition = Scrape(Request(Query, Instance, &cursor), Format, &cursor)
+		condition = Scrape(Request(Query, Instance, &cursor), Instance, Format, &cursor)
 	}
 }

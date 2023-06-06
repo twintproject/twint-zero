@@ -17,7 +17,13 @@ func Request(Query *string, Instance *string, cursor *string) io.ReadCloser {
 	if *cursor != "" {
 		url = fmt.Sprintf("https://%s/search%s", *Instance, *cursor)
 	}
+	hlsCookie := &http.Cookie{
+		Name:   "hlsPlayback",
+		Value:  "on",
+		MaxAge: 300,
+	}
 	req, err := http.NewRequest("GET", url, nil)
+	req.AddCookie(hlsCookie)
 	if err != nil {
 		log.Fatalf("[nr] %s\n", err)
 	}
