@@ -18,6 +18,7 @@ type Tweet struct {
 	Username    string       `json:"username"`
 	Fullname    string       `json:"fullname"`
 	Timestamp   string       `json:"timestamp"`
+	Quotedid    string       `json:"quotedid"`
 	Attachments []Attachment `json:"attachments"`
 
 	Stats TweetStats `json:"stats"`
@@ -68,6 +69,10 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 
 		tweet_handle := t.Find("a.username").First().Text()
 		tweet_fname := t.Find("a.fullname").First().Text()
+
+		tweet_quotedid_h, _ := t.Find("a.quote-link").Attr("href")
+		tweet_quotedid_s := strings.Split(tweet_quotedid_h, "/")
+		tweet_quotedid := extractViaRegexp(&(tweet_quotedid_s[len(tweet_quotedid_s)-1]), `\d*`)
 
 		// tweet stats: reply, retweet, quote, like as span.tweet-stats childs of tweet_stats
 		tweet_stats := t.Find("div.tweet-stats")
@@ -147,6 +152,7 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 				Username:    tweet_handle,
 				Fullname:    tweet_fname,
 				Timestamp:   tweet_TS,
+				Quotedid:    tweet_quotedid,
 				Attachments: tweet_attachments,
 				Stats:       stats,
 			}
