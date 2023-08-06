@@ -18,7 +18,7 @@ Thank you, and enjoy!
 
 ## CLI Arguments
 1) `$QUERY`: [Here](https://github.com/igorbrigadir/twitter-advanced-search) you go.
-2) `$INSTANCE`: [Setup your own]([https://github.com/zedeus/nitter/wiki/Instances](https://github.com/zedeus/nitter/#installation)).
+2) `$INSTANCE`: [Setup your own](https://github.com/zedeus/nitter/wiki/Instances](https://github.com/zedeus/nitter/#installation).
 2) `$FORMAT`: "csv" or "json".
 
 # Questions/issues
