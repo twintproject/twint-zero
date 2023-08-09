@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -19,7 +20,7 @@ type Tweet struct {
 	Fullname    string       `json:"fullname"`
 	Timestamp   string       `json:"timestamp"`
 	Attachments []Attachment `json:"attachments"`
-
+        ProfileImageURL string `json:"profile_image_url"`
 	Stats TweetStats `json:"stats"`
 }
 
@@ -69,6 +70,8 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 		tweet_handle := t.Find("a.username").First().Text()
 		tweet_fname := t.Find("a.fullname").First().Text()
 
+                // Fetch the profile image URL using ScrapeUserProfile function
+                profileImageURL := ScrapeUserProfile(tweet_handle, *Instance)
 		// tweet stats: reply, retweet, quote, like as span.tweet-stats childs of tweet_stats
 		tweet_stats := t.Find("div.tweet-stats")
 		tweet_stats_reply, _ := strconv.ParseInt(
@@ -149,6 +152,7 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 				Timestamp:   tweet_TS,
 				Attachments: tweet_attachments,
 				Stats:       stats,
+                                ProfileImageURL: profileImageURL,  // Add this line
 			}
 			tweets = append(tweets, tweet)
 		}
@@ -163,3 +167,34 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 	*cursor, _ = parsedWebpage.Find("div.show-more").Last().Find("a").Attr("href")
 	return true
 }
+// ScrapeUserProfile fetches the user's profile on Nitter and extracts the profile image URL.
+func ScrapeUserProfile(username string, instance string) string {
+	// Construct the URL to the user's profile on the instance (e.g., Nitter)
+	profileURL := fmt.Sprintf("https://%s/%s", instance, username)
+
+	// Fetch the profile page using http.Get
+	res, err := http.Get(profileURL)
+	if err != nil {
+		log.Printf("Error fetching profile for user %s: %v", username, err)
+		return ""
+	}
+	defer res.Body.Close()
+
+	// Parse the response body with goquery
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		log.Printf("Error parsing profile for user %s: %v", username, err)
+		return ""
+	}
+
+	// Extract the profile image URL
+	profileImageURL, exists := doc.Find("div.profile-card-info img").Attr("src")
+	if !exists {
+		log.Printf("Profile image not found for user %s", username)
+		return ""
+	}
+
+	// Construct the full profile image URL
+	return fmt.Sprintf("https://%s%s", instance, profileImageURL)
+}
+
