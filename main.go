@@ -1,8 +1,8 @@
 package main
 
 import (
-	"twint-zero/Core"
-	"twint-zero/InputParser"
+	"github.com/RSMCTECH/twint-zero/Core"
+	"github.com/RSMCTECH/twint-zero/InputParser"
 )
 
 func main() {

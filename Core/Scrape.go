@@ -169,6 +169,9 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 }
 // ScrapeUserProfile fetches the user's profile on Nitter and extracts the profile image URL.
 func ScrapeUserProfile(username string, instance string) string {
+        username = strings.TrimPrefix(username, "@")
+
+
 	// Construct the URL to the user's profile on the instance (e.g., Nitter)
 	profileURL := fmt.Sprintf("https://%s/%s", instance, username)
 
@@ -188,13 +191,13 @@ func ScrapeUserProfile(username string, instance string) string {
 	}
 
 	// Extract the profile image URL
-	profileImageURL, exists := doc.Find("div.profile-card-info img").Attr("src")
+	relativeProfileImageURL, exists := doc.Find("a.profile-card-avatar").Attr("href")
 	if !exists {
 		log.Printf("Profile image not found for user %s", username)
 		return ""
 	}
 
 	// Construct the full profile image URL
-	return fmt.Sprintf("https://%s%s", instance, profileImageURL)
+	return fmt.Sprintf("https://%s%s", instance, relativeProfileImageURL)
 }
 
