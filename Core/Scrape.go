@@ -24,10 +24,10 @@ type Tweet struct {
 	Stats TweetStats `json:"stats"`
 
 	QuoteFullname string `json:"quote_fullname,omitempty"`
-    QuoteUsername string `json:"quote_username,omitempty"`
-    QuoteDate     string `json:"quote_date,omitempty"`
-    QuoteID       string `json:"quote_id,omitempty"`
-    QuoteText     string `json:"quote_text,omitempty"`
+    	QuoteUsername string `json:"quote_username,omitempty"`
+    	QuoteDate     string `json:"quote_date,omitempty"`
+    	QuoteID       string `json:"quote_id,omitempty"`
+    	QuoteText     string `json:"quote_text,omitempty"`
 }
 
 type Attachment struct {
@@ -62,7 +62,7 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 	}
 
 	var tweets []Tweet
-    parsedWebpage.Find("div.timeline-item").Each(func(i int, t *goquery.Selection) {
+    	parsedWebpage.Find("div.timeline-item").Each(func(i int, t *goquery.Selection) {
 		tweet_ID_h, _ := t.Find("a").Attr("href")
 		tweet_ID_s := strings.Split(tweet_ID_h, "/")
 		tweet_ID := extractViaRegexp(&(tweet_ID_s[len(tweet_ID_s)-1]), `\d*`)
