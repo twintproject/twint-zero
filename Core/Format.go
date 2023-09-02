@@ -34,11 +34,17 @@ func FormatTweetsCSV(tweets []Tweet) {
 			tweet.Username,
 			tweet.Fullname,
 			tweet.Text,
+			tweet.ReplyTo,
 			strings.Join(attachments, ","),
 			fmt.Sprintf("%d", tweet.Stats.Replies),
 			fmt.Sprintf("%d", tweet.Stats.Retweets),
 			fmt.Sprintf("%d", tweet.Stats.Quotes),
 			fmt.Sprintf("%d", tweet.Stats.Likes),
+			tweet.QuoteFullname,
+            tweet.QuoteUsername,
+            tweet.QuoteDate,
+            tweet.QuoteText,
+            tweet.QuoteID,
 		}
 		if err := w.Write(row); err != nil {
 			log.Fatalln("error writing row to csv:", err)
