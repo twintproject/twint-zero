@@ -170,10 +170,10 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 				Attachments: tweet_attachments,
 				Stats:       stats,
 				QuoteFullname: quote_fullname,
-                QuoteUsername: quote_username,
-                QuoteDate:     quote_date, 
-                QuoteID:       quote_id,
-                QuoteText:     quote_text,
+		                QuoteUsername: quote_username,
+		                QuoteDate:     quote_date, 
+		                QuoteID:       quote_id,
+		                QuoteText:     quote_text,
 			}
 			tweets = append(tweets, tweet)
 		}
