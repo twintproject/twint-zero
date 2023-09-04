@@ -140,16 +140,16 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 			}
 		})
 
-		var quote_fullname, quote_username, quote_date, quote_id, quote_text string
-
-        if quoteInfo := t.Find("div.quote"); quoteInfo.Length() > 0 {
-            quote_fullname = quoteInfo.Find("a.fullname").Text()
-            quote_username = quoteInfo.Find("a.username").Text()
-            quote_date, _ = quoteInfo.Find("span.tweet-date").Find("a").Attr("title")
-            quote_id_href, _ := quoteInfo.Find("a.quote-link").Attr("href")
-            quote_id = extractViaRegexp(&quote_id_href, `\d*`)
-            quote_text = quoteInfo.Find("div.quote-text").Text()
-        }
+		var quote_fullname, quote_username, quote_date, quote_text, quote_id string
+		if quoteInfo := t.Find("div.quote"); quoteInfo.Length() > 0 {
+			quote_fullname = quoteInfo.Find("a.fullname").Text()
+			quote_username = quoteInfo.Find("a.username").Text()
+			quote_date, _ = quoteInfo.Find("span.tweet-date").Find("a").Attr("title")
+			quote_id_h, _ := quoteInfo.Find("a.quote-link").Attr("href")
+			quote_id_s := strings.Split(quote_id_h, "/")
+			quote_id = extractViaRegexp(&(quote_id_s[len(quote_id_s)-1]), `\d*`)
+			quote_text = quoteInfo.Find("div.quote-text").Text()
+		}
 
 		stats := TweetStats{
 			Replies:  tweet_stats_reply,
