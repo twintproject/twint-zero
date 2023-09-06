@@ -33,3 +33,5 @@ MIT
 [Francesco Poldi](https://twitter.com/noneprivacy)
 
 [Simon Archer](https://mastodon.social/@archy_bold): JSON formatting and attachments parsing
+
+[Julian](https://github.com/juste97): quoted tweet and its metadata fields
