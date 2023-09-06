@@ -15,12 +15,19 @@ type Tweet struct {
 	ID          string       `json:"id"`
 	URL         string       `json:"url"`
 	Text        string       `json:"text"`
+	ReplyTo 	string 		 `json:"reply_to,omitempty"`
 	Username    string       `json:"username"`
 	Fullname    string       `json:"fullname"`
 	Timestamp   string       `json:"timestamp"`
 	Attachments []Attachment `json:"attachments"`
 
 	Stats TweetStats `json:"stats"`
+
+	QuoteFullname string `json:"quote_fullname,omitempty"`
+    	QuoteUsername string `json:"quote_username,omitempty"`
+    	QuoteDate     string `json:"quote_date,omitempty"`
+    	QuoteID       string `json:"quote_id,omitempty"`
+    	QuoteText     string `json:"quote_text,omitempty"`
 }
 
 type Attachment struct {
@@ -55,7 +62,7 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 	}
 
 	var tweets []Tweet
-	parsedWebpage.Find("div.timeline-item").Each(func(i int, t *goquery.Selection) {
+    	parsedWebpage.Find("div.timeline-item").Each(func(i int, t *goquery.Selection) {
 		tweet_ID_h, _ := t.Find("a").Attr("href")
 		tweet_ID_s := strings.Split(tweet_ID_h, "/")
 		tweet_ID := extractViaRegexp(&(tweet_ID_s[len(tweet_ID_s)-1]), `\d*`)
@@ -66,10 +73,11 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 
 		tweet_text := t.Find("div.tweet-content.media-body").Text()
 
+		reply_to := t.Find("div.replying-to").Text()
+
 		tweet_handle := t.Find("a.username").First().Text()
 		tweet_fname := t.Find("a.fullname").First().Text()
 
-		// tweet stats: reply, retweet, quote, like as span.tweet-stats childs of tweet_stats
 		tweet_stats := t.Find("div.tweet-stats")
 		tweet_stats_reply, _ := strconv.ParseInt(
 			strings.TrimSpace(
@@ -132,6 +140,17 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 			}
 		})
 
+		var quote_fullname, quote_username, quote_date, quote_text, quote_id string
+		if quoteInfo := t.Find("div.quote"); quoteInfo.Length() > 0 {
+			quote_fullname = quoteInfo.Find("a.fullname").Text()
+			quote_username = quoteInfo.Find("a.username").Text()
+			quote_date, _ = quoteInfo.Find("span.tweet-date").Find("a").Attr("title")
+			quote_id_h, _ := quoteInfo.Find("a.quote-link").Attr("href")
+			quote_id_s := strings.Split(quote_id_h, "/")
+			quote_id = extractViaRegexp(&(quote_id_s[len(quote_id_s)-1]), `\d*`)
+			quote_text = quoteInfo.Find("div.quote-text").Text()
+		}
+
 		stats := TweetStats{
 			Replies:  tweet_stats_reply,
 			Retweets: tweet_stats_retweet,
@@ -144,11 +163,17 @@ func Scrape(responseBody io.ReadCloser, Instance *string, Format *string, cursor
 				ID:          tweet_ID,
 				URL:         tweet_URL,
 				Text:        tweet_text,
+				ReplyTo: 	 reply_to,
 				Username:    tweet_handle,
 				Fullname:    tweet_fname,
 				Timestamp:   tweet_TS,
 				Attachments: tweet_attachments,
 				Stats:       stats,
+				QuoteFullname: quote_fullname,
+		                QuoteUsername: quote_username,
+		                QuoteDate:     quote_date, 
+		                QuoteID:       quote_id,
+		                QuoteText:     quote_text,
 			}
 			tweets = append(tweets, tweet)
 		}
